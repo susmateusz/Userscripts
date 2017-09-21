@@ -27,6 +27,24 @@ this.$ = this.jQuery = jQuery.noConflict(true);
             var leftLessonsCounter = document.createElement('div');
             leftLessonsCounter.textContent = leftLessonsText();
             skillsHeader.appendChild(leftLessonsCounter);
+            var hideFinishedButton = document.createElement("input");
+            hideFinishedButton.type = "button";
+            hideFinishedButton.onclick = toggleFinishedVisibility;
+            hideFinishedButton.value = "Toggle finished visiblity";
+            skillsHeader.appendChild(hideFinishedButton);
+            waitForKeyElements(".W1dac",toggleFinishedVisibility);
+        }
+    }
+    function toggleFinishedVisibility() {
+        var skills = document.getElementsByClassName("W1dac");
+        for(var i = 0; i < skills.length; i++) {
+            if(skills[i].getAttribute("data-test") && skills[i].getAttribute("data-test").startsWith("gold")) {
+                if(skills[i].style.display === 'none') {
+                    skills[i].style.display = 'inline-block';
+                } else {
+                    skills[i].style.display = 'none';
+                }
+            }
         }
     }
     function leftSkillsText() {
