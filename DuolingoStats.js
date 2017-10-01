@@ -21,12 +21,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
     function mainPageFunction(jNode) {
         var skillsHeader = document.getElementsByClassName("_2Wt53")[0];
         if(skillsHeader.childElementCount == 2) {
+            // Unfinished skills
             var leftSkillsCounter = document.createElement('div');
             leftSkillsCounter.textContent = leftSkillsText();
             skillsHeader.appendChild(leftSkillsCounter);
+            // Partialy finished skills
+            var partialyFinishedSkillsCounter = document.createElement('div');
+            partialyFinishedSkillsCounter.textContent = partiallySkillsText();
+            skillsHeader.appendChild(partialyFinishedSkillsCounter);
+            // Lessons left
             var leftLessonsCounter = document.createElement('div');
             leftLessonsCounter.textContent = leftLessonsText();
             skillsHeader.appendChild(leftLessonsCounter);
+            // Toggle finished visiblity
             var hideFinishedButton = document.createElement("input");
             hideFinishedButton.type = "button";
             hideFinishedButton.onclick = toggleFinishedVisibility;
@@ -50,8 +57,21 @@ this.$ = this.jQuery = jQuery.noConflict(true);
     function leftSkillsText() {
         return "Unfinished skills: " + document.getElementsByClassName("_2TMjc").length;
     }
+    function partiallySkillsText() {
+        return "Revisions required: " + partiallyFinished();
+    }
     function leftLessonsText() {
         return "Lessons left: " + leftLessonsCount();
+    }
+    function partiallyFinished() {
+        var skills = document.getElementsByClassName("W1dac");
+        var finishedLessons = 0;
+        for(var i = 0; i < skills.length; i++) {
+            if(skills[i].getAttribute("data-test") && skills[i].getAttribute("data-test").startsWith("gold")) {
+                finishedLessons += 1;
+            }
+        }
+        return skills.length - finishedLessons;
     }
     function leftLessonsCount() {
         var result = 0;
