@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         DuolingoStats
 // @namespace    http://duolingo.com/
-// @version      0.1
+// @version      1
+// @updateURL    https://raw.githubusercontent.com/susmateusz/Userscripts/master/DuolingoStats.js
 // @description  Some statistics about Duolingo.
 // @author       Mateusz Sus
 // @match        https://www.duolingo.com/*
@@ -12,14 +13,36 @@
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
+var duolingoApi = {
+    mainPageUrl : "duolingo.com/",
+    treeHeaderClass : "_2Wt53",
+    skillsRowClass : "._2GJb6",
+    skillLinkClass : "W1dac",
+    partiallyFinishedSpanClass : "_2TMjc",
+    linkColorAttributeName : "data-test",
+    skillColorGold : "gold"
+};
+
+var placeholders = {
+    toggleFinishedVisibility : "Toggle finished visiblity",
+    unfinishedSkills : "Unfinished skills: ",
+    revisionRequired : "Revisions required: ",
+    lessonsLeft : "Lessons left: ",
+    masteredWords : "Opanowano s³ów: ",
+    avgWordStrength : "Œrednia si³a s³owa: "
+};
+
+
+
 (function() {
     'use strict';
 
-    if(window.location.href.endsWith("duolingo.com/")) {
-        waitForKeyElements("._2GJb6", mainPageFunction);
+    if(window.location.href.endsWith(duolingoApi.mainPageUrl)) {
+        waitForKeyElements(duolingoApi.skillsRowClass, mainPageFunction);
     }
+
     function mainPageFunction(jNode) {
-        var skillsHeader = document.getElementsByClassName("_2Wt53")[0];
+        var skillsHeader = document.getElementsByClassName(duolingoApi.treeHeaderClass)[0];
         if(skillsHeader.childElementCount == 2) {
             // Unfinished skills
             var leftSkillsCounter = document.createElement('div');
@@ -37,15 +60,15 @@ this.$ = this.jQuery = jQuery.noConflict(true);
             var hideFinishedButton = document.createElement("input");
             hideFinishedButton.type = "button";
             hideFinishedButton.onclick = toggleFinishedVisibility;
-            hideFinishedButton.value = "Toggle finished visiblity";
+            hideFinishedButton.value = placeholders.toggleFinishedVisibility;
             skillsHeader.appendChild(hideFinishedButton);
-            waitForKeyElements(".W1dac",toggleFinishedVisibility);
+            waitForKeyElements(duolingoApi.skillLinkClass, toggleFinishedVisibility);
         }
     }
     function toggleFinishedVisibility() {
-        var skills = document.getElementsByClassName("W1dac");
+        var skills = document.getElementsByClassName(duolingoApi.skillLinkClass);
         for(var i = 0; i < skills.length; i++) {
-            if(skills[i].getAttribute("data-test") && skills[i].getAttribute("data-test").startsWith("gold")) {
+            if(skills[i].getAttribute(duolingoApi.linkColorAttributeName) && skills[i].getAttribute(duolingoApi.linkColorAttributeName).startsWith(duolingoApi.skillColorGold)) {
                 if(skills[i].style.display === 'none') {
                     skills[i].style.display = 'inline-block';
                 } else {
@@ -55,19 +78,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
         }
     }
     function leftSkillsText() {
-        return "Unfinished skills: " + document.getElementsByClassName("_2TMjc").length;
+        return placeholders.unfinishedSkills + document.getElementsByClassName(duolingoApi.partiallyFinishedSpanClass).length;
     }
     function partiallySkillsText() {
-        return "Revisions required: " + partiallyFinished();
+        return placeholders.revisionRequired + partiallyFinished();
     }
     function leftLessonsText() {
-        return "Lessons left: " + leftLessonsCount();
+        return placeholders.lessonsLeft + leftLessonsCount();
     }
     function partiallyFinished() {
-        var skills = document.getElementsByClassName("W1dac");
+        var skills = document.getElementsByClassName(duolingoApi.skillLinkClass);
         var finishedLessons = 0;
         for(var i = 0; i < skills.length; i++) {
-            if(skills[i].getAttribute("data-test") && skills[i].getAttribute("data-test").startsWith("gold")) {
+            if(skills[i].getAttribute(duolingoApi.linkColorAttributeName) && skills[i].getAttribute(duolingoApi.linkColorAttributeName).startsWith(duolingoApi.skillColorGold)) {
                 finishedLessons += 1;
             }
         }
@@ -75,7 +98,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
     }
     function leftLessonsCount() {
         var result = 0;
-        var unfinishedLessons = document.getElementsByClassName("_2TMjc");
+        var unfinishedLessons = document.getElementsByClassName(duolingoApi.partiallyFinishedSpanClass);
         for(var i = 0; i < unfinishedLessons.length; i++) {
             var parts = unfinishedLessons[i].textContent.split("/");
             var done = parseInt(parts[0]);
@@ -110,8 +133,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
         var stars3 = countStars(3);
         var stars2 = countStars(2);
         var stars1 = countStars(1);
-        var result = "Opanowano s³ów: " +len;
-        result += "\r\nŒrednia si³a s³owa: "+ average_health;
+        var result = placeholders.masteredWords + len;
+        result += "\r\n" + placeholders.avgWordStrength + average_health;
         result += "\r\n****\t: "+ stars4 + "%";
         result += "\r\n***\t\t: "+ stars3 + "%";
         result += "\r\n**\t\t: "+ stars2 + "%";
