@@ -25,7 +25,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
         waitForKeyElements("#yui-gen1-button", triggerButton);
     } else {
         document.getElementsByClassName("today")[0].click();
-        setTimeout(parseDishes, 500);
+        waitForKeyElements(".itemgroup", parseDishes);
     }
 })();
 
